@@ -1,18 +1,28 @@
 const path = require('path');
 
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, ipcRenderer } = require('electron');
 const isDev = require('electron-is-dev');
+const AsyncDatabase = require('./Model/dbConfig');
+const db = new AsyncDatabase("./database/database.db");
 
+
+db.getTestTable((err,rows)=>{
+console.log(rows)
+})
 function createWindow() {
   // Create the browser window.
   const win = new BrowserWindow({
     width: 800,
     height: 600,
-    frame:false,
+    frame:true,
     webPreferences: {
       nodeIntegration: true,
+      contextIsolation: false,
+      enableRemoteModule: true,
+      partition:'inco',
+      preload: path.join("./src/index.js"),
     },
-    
+
   });
   
   // and load the index.html of the app.
@@ -26,7 +36,7 @@ function createWindow() {
   );
   // Open the DevTools.
   if (isDev) {
-    win.webContents.openDevTools({ mode: 'detach' });
+    win.webContents.openDevTools({ mode: 'attach' });
   }
 }
 
